@@ -21,12 +21,13 @@ USAGE_ERR	= 'Usage: LiquidSFZ.%s(%s) # %s'
 
 class LiquidSFZ:
 
-	def __init__(self):
+	def __init__(self, filename = None):
 		signal(SIGINT, self._system_signal)
 		signal(SIGTERM, self._system_signal)
-		self.stay_alive = True
+		if filename is None:
+			filename = os.path.join(os.path.dirname(__file__), "empty.sfz")
 		self.process = subprocess.Popen(
-			[ "liquidsfz", os.path.join(os.path.dirname(__file__), "empty.sfz") ],
+			[ "liquidsfz", filename ],
 			encoding="ASCII",
 			stdout=subprocess.PIPE, stdin=subprocess.PIPE, stderr=subprocess.PIPE)
 		self.read_response()
@@ -50,7 +51,7 @@ class LiquidSFZ:
 		return self.read_response()
 
 	def write(self, command):
-		logging.debug('Writing "%s"' % command)
+		logging.debug('Writing "%s"', command)
 		self.process.stdin.write(command + os.linesep)
 		self.process.stdin.flush()
 
@@ -58,7 +59,11 @@ class LiquidSFZ:
 		logging.debug('Reading response')
 		buf = io.StringIO()
 		line = str()
-		while self.stay_alive:
+		while True:
+			if self.process.poll() is not None:
+				logging.debug('liquidsfz terminated with exit code %d',
+					self.process.returncode)
+				return None
 			char = self.process.stdout.read(1)
 			if char == os.linesep:
 				buf.write(line)
@@ -83,7 +88,6 @@ class LiquidSFZ:
 
 	def _terminate(self):
 		self.process.terminate()
-		self.stay_alive = False
 
 class UsageError(Exception):
 	pass
