@@ -13,6 +13,7 @@ Interface with LiquidSFZ. To see availeble commnds:
 import subprocess, io, os, re, logging
 from functools import partial
 from signal import signal, SIGINT, SIGTERM
+from good_logging import log_error
 
 PROMPT		= 'liquidsfz> '
 HELP_REGEX	= '^(\w+)\s([^\-]+)\-\s(.*)'
@@ -82,7 +83,7 @@ class LiquidSFZ:
 		self._terminate()
 
 	def _system_signal(self, *_):
-		logging.debug("Caught signal - shutting down")
+		logging.debug('Caught signal - shutting down')
 		self._terminate()
 
 	def _terminate(self):
@@ -92,15 +93,6 @@ class LiquidSFZ:
 class UsageError(Exception):
 	pass
 
-def log_error(e):
-	tb = e.__traceback__
-	logging.error('%s %s(), line %s: %s "%s"',
-		os.path.basename(tb.tb_frame.f_code.co_filename),
-		tb.tb_frame.f_code.co_name,
-		tb.tb_lineno,
-		type(e).__name__,
-		str(e),
-	)
 
 if __name__ == "__main__":
 	log_level = logging.DEBUG
