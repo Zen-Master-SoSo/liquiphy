@@ -17,7 +17,7 @@ from good_logging import log_error
 
 PROMPT		= 'liquidsfz> '
 HELP_REGEX	= '^(\w+)\s([^\-]+)\-\s(.*)'
-USAGE_ERR	= 'Usage: LiquidSFZ.%s(%s)'
+USAGE_ERR	= 'Usage: LiquidSFZ.%s(%s) # %s'
 
 class LiquidSFZ:
 
@@ -31,27 +31,22 @@ class LiquidSFZ:
 			stdout=subprocess.PIPE, stdin=subprocess.PIPE, stderr=subprocess.PIPE)
 		self.read_response()
 		self.write('help')
-		helptext = self.read_response()
-		for tup in [
-			self._interpret_helptext(line) \
-			for line in helptext.split("\n")
-			if re.match(HELP_REGEX, line)
-		]:
-			setattr(self, tup[0], partial(self._exec, tup))
-
-	def _interpret_helptext(self, line):
-		m = re.match(HELP_REGEX, line)
-		args = m[2].strip()
-		return (
-			m[1],
-			args.split(' ') if args else [],
-			m[3]
-		)
+		for line in self.read_response().split("\n"):
+			m = re.match(HELP_REGEX, line)
+			if m:
+				args = m[2].strip()
+				tup = (
+					m[1],
+					args.split(' ') if args else [],
+					m[3]
+				)
+				setattr(self, tup[0], partial(self._exec, tup))
 
 	def _exec(self, funcsig, /, *args):
 		if len(funcsig[1]) != len(args):
-			raise UsageError(USAGE_ERR % (funcsig[0], ", ".join(funcsig[1])))
-		self.write(funcsig[0] + " " + " ".join(args))
+			raise UsageError(USAGE_ERR %
+				(funcsig[0], ", ".join(funcsig[1]), funcsig[2]))
+		self.write(funcsig[0] + " " + " ".join([ str(arg) for arg in args]))
 		return self.read_response()
 
 	def write(self, command):
@@ -95,14 +90,21 @@ class UsageError(Exception):
 
 
 if __name__ == "__main__":
-	log_level = logging.DEBUG
+	from pprint import pprint
 	log_format = "[%(filename)24s:%(lineno)4d] %(levelname)-8s %(message)s"
-	logging.basicConfig(level = log_level, format = log_format)
+	logging.basicConfig(level = logging.DEBUG, format = log_format)
 
 	with LiquidSFZ() as liquid:
-		print(dir(liquid))
+		pprint([ att for att in dir(liquid) if att[0] != '_' ])
+		print(liquid.info())
+		print(liquid.max_voices(8))
+		print(liquid.info())
 		try:
 			liquid.help('bad arg', 'another')
+		except UsageError as e:
+			log_error(e)
+		try:
+			liquid.gain()
 		except UsageError as e:
 			log_error(e)
 		print(liquid.help())
