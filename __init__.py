@@ -6,12 +6,12 @@
 Interface with LiquidSFZ. To see availeble commnds:
 
 	with LiquidSFZ(filename) as liquid:
+		print(dir(liquid))
 		print(liquid.help())
 
 """
 import subprocess, io, os, re, logging
 from functools import partial
-from time import sleep
 from signal import signal, SIGINT, SIGTERM
 
 PROMPT		= 'liquidsfz> '
@@ -25,13 +25,12 @@ class LiquidSFZ:
 		signal(SIGTERM, self._system_signal)
 		self.stay_alive = True
 		self.process = subprocess.Popen(
-			["liquidsfz", "/home/liyang/docs/sfz/Drumsets/Pearl-Masters/Pearl.sfz"],
+			[ "liquidsfz", os.path.join(os.path.dirname(__file__), "empty.sfz") ],
 			encoding="ASCII",
 			stdout=subprocess.PIPE, stdin=subprocess.PIPE, stderr=subprocess.PIPE)
-		logging.debug(self.read_response())
+		self.read_response()
 		self.write('help')
 		helptext = self.read_response()
-		logging.debug('Setting functions')
 		for tup in [
 			self._interpret_helptext(line) \
 			for line in helptext.split("\n")
@@ -72,7 +71,6 @@ class LiquidSFZ:
 			else:
 				line += char
 			if line == PROMPT:
-				logging.debug('Got "%s" prompt - break', PROMPT)
 				break
 		buf.seek(0)
 		return buf.read()
@@ -116,6 +114,5 @@ if __name__ == "__main__":
 		except UsageError as e:
 			log_error(e)
 		print(liquid.help())
-		sleep(.25)
 
 #  end liquiphy/__init__.py
