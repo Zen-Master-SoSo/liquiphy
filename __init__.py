@@ -12,21 +12,16 @@ Interface with LiquidSFZ. To see availeble commnds:
 """
 import subprocess, io, os, re, logging
 from functools import partial
-from signal import signal, SIGINT, SIGTERM
-from jack import Client
 from good_logging import log_error
 
 PROMPT		= 'liquidsfz> '
 HELP_REGEX	= '^(\w+)\s([^\-]+)\-\s(.*)'
 USAGE_ERR	= 'Usage: LiquidSFZ.%s(%s) # %s'
-JACK_NAME	= 'liquidjack'
 
 
 class LiquidSFZ:
 
 	def __init__(self, filename = None):
-		signal(SIGINT, self._system_signal)
-		signal(SIGTERM, self._system_signal)
 		if filename is None:
 			filename = os.path.join(os.path.dirname(__file__), "empty.sfz")
 		self.process = subprocess.Popen(
@@ -39,12 +34,12 @@ class LiquidSFZ:
 			m = re.match(HELP_REGEX, line)
 			if m:
 				args = m[2].strip()
-				tup = (
+				funcsig = (
 					m[1],
 					args.split(' ') if args else [],
 					m[3]
 				)
-				setattr(self, tup[0], partial(self._exec, tup))
+				setattr(self, funcsig[0], partial(self._exec, funcsig))
 
 	def _exec(self, funcsig, /, *args):
 		if len(funcsig[1]) != len(args):
@@ -83,45 +78,11 @@ class LiquidSFZ:
 		return self
 
 	def __exit__(self, *_):
-		self._terminate()
-
-	def _system_signal(self, *_):
-		logging.debug('Caught signal - shutting down')
-		self._terminate()
-
-	def _terminate(self):
 		self.process.terminate()
+
 
 class UsageError(Exception):
 	pass
-
-class LiquidJack(LiquidSFZ):
-	"""
-	LiquidSFZ client with added Jack audio tools functionality.
-	"""
-
-	midi_in = None
-	audio_out_1 = None
-	audio_out_2 = None
-
-	def __init__(self, filename = None):
-		self.client = Client(JACK_NAME, no_start_server=True)
-		self.client.set_port_registration_callback(self.port_registration_callback)
-		self.client.activate()
-		super().__init__(filename)
-
-	def port_registration_callback(self, port, register):
-		"""
-		Called by Jack when port is added or removed
-		"""
-		if register and 'liquidsfz' in port.name:
-			if port.is_midi and self.midi_in is None:
-				self.midi_in = port
-			elif 'audio_out_1' in port.name and self.audio_out_1 is None:
-				self.audio_out_1 = port
-			elif 'audio_out_2' in port.name and self.audio_out_2 is None:
-				self.audio_out_2 = port
-
 
 if __name__ == "__main__":
 	from pprint import pprint
