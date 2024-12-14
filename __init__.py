@@ -45,7 +45,7 @@ class LiquidSFZ:
 		if len(funcsig[1]) != len(args):
 			raise UsageError(USAGE_ERR %
 				(funcsig[0], ", ".join(funcsig[1]), funcsig[2]))
-		self.write(funcsig[0] + " " + " ".join([ str(arg) for arg in args]))
+		self.write(funcsig[0] + " " + " ".join(str(arg) for arg in args))
 		return self.read_response()
 
 	def write(self, command):
