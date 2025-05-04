@@ -3,7 +3,7 @@
 #  Copyright 2024 liyang <liyang@veronica>
 #
 """
-Interface with LiquidSFZ. To see availeble commnds:
+Interface with LiquidSFZ. To see available commnds:
 
 	with LiquidSFZ(filename) as liquid:
 		print(dir(liquid))
@@ -54,7 +54,6 @@ class LiquidSFZ:
 		self.process.stdin.flush()
 
 	def read_response(self):
-		logging.debug('Reading response')
 		buf = io.StringIO()
 		line = str()
 		while True:
