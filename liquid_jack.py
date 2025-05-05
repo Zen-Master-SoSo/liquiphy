@@ -45,15 +45,28 @@ class LiquidJack(LiquidSFZ):
 				self.audio_out_2 = port
 
 
-if __name__ == "__main__":
+def main():
+	from jack import JackError
 	from pprint import pprint
+
 	log_format = "[%(filename)24s:%(lineno)4d] %(levelname)-8s %(message)s"
 	logging.basicConfig(level = logging.DEBUG, format = log_format)
 
-	with LiquidJack() as liquid:
-		pprint([ att for att in dir(liquid) if att[0] != '_' ])
-		print(liquid.midi_in)
-		print(liquid.audio_out_1)
-		print(liquid.audio_out_2)
+	try:
+		with LiquidJack() as liquid:
+			pprint([ att for att in dir(liquid) if att[0] != '_' ])
+			print(liquid.midi_in)
+			print(liquid.audio_out_1)
+			print(liquid.audio_out_2)
+		return 0
+	except JackError:
+		print('Could not connect to JACK server. Is it running?')
+		return 1
+
+
+if __name__ == "__main__":
+	import sys
+	sys.exit(main())
+
 
 #  end liquiphy/__init__.py
