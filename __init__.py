@@ -12,7 +12,6 @@ Interface with LiquidSFZ. To see available commnds:
 """
 import subprocess, io, os, re, logging
 from functools import partial
-from good_logging import log_error
 
 PROMPT		= 'liquidsfz> '
 HELP_REGEX	= '^(\w+)\s([^\-]+)\-\s(.*)'
@@ -83,24 +82,5 @@ class LiquidSFZ:
 class UsageError(Exception):
 	pass
 
-if __name__ == "__main__":
-	from pprint import pprint
-	log_format = "[%(filename)24s:%(lineno)4d] %(levelname)-8s %(message)s"
-	logging.basicConfig(level = logging.DEBUG, format = log_format)
-
-	with LiquidSFZ() as liquid:
-		pprint([ att for att in dir(liquid) if att[0] != '_' ])
-		print(liquid.info())
-		print(liquid.max_voices(8))
-		print(liquid.info())
-		try:
-			liquid.help('bad arg', 'another')
-		except UsageError as e:
-			log_error(e)
-		try:
-			liquid.gain()
-		except UsageError as e:
-			log_error(e)
-		print(liquid.help())
 
 #  end liquiphy/__init__.py
