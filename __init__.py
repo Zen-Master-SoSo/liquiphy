@@ -20,11 +20,16 @@ USAGE_ERR	= 'Usage: LiquidSFZ.%s(%s) # %s'
 
 class LiquidSFZ:
 
-	def __init__(self, filename = None):
-		if filename is None:
-			filename = os.path.join(os.path.dirname(__file__), "empty.sfz")
+	def __init__(self, filename = None, defer_start = False):
+		logging.debug('Initializing LiquidSFZ with file "%s"', filename)
+		self.filename = os.path.join(os.path.dirname(__file__), "empty.sfz") \
+			if filename is None else filename
+		if not defer_start:
+			self.start()
+
+	def start(self):
 		self.process = subprocess.Popen(
-			[ "liquidsfz", filename ],
+			[ "liquidsfz", self.filename ],
 			encoding="ASCII",
 			stdout=subprocess.PIPE, stdin=subprocess.PIPE, stderr=subprocess.PIPE)
 		self.read_response()
