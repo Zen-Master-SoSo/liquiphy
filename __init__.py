@@ -53,7 +53,6 @@ class LiquidSFZ:
 		return self.read_response()
 
 	def write(self, command):
-		logging.debug('Writing "%s"', command)
 		self.process.stdin.write(command + os.linesep)
 		self.process.stdin.flush()
 
