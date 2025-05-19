@@ -21,7 +21,6 @@ USAGE_ERR	= 'Usage: LiquidSFZ.%s(%s) # %s'
 class LiquidSFZ:
 
 	def __init__(self, filename = None, defer_start = False):
-		logging.debug('Initializing LiquidSFZ with file "%s"', filename)
 		self.filename = os.path.join(os.path.dirname(__file__), "empty.sfz") \
 			if filename is None else filename
 		if not defer_start:
@@ -61,8 +60,9 @@ class LiquidSFZ:
 		line = str()
 		while True:
 			if self.process.poll() is not None:
-				logging.debug('liquidsfz terminated with exit code %d',
-					self.process.returncode)
+				if self.process.returncode:
+					logging.warning('liquidsfz terminated with exit code %d',
+						self.process.returncode)
 				return None
 			char = self.process.stdout.read(1)
 			if char == os.linesep:
