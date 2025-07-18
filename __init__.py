@@ -80,7 +80,7 @@ class LiquidSFZ:
 		return self
 
 	def __exit__(self, *_):
-		self.process.terminate()
+		self.quit()
 
 
 class UsageError(Exception):
