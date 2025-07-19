@@ -61,7 +61,8 @@ def main():
 		return 1
 	conn_man.on_client_registration(on_client_registration)
 	conn_man.on_port_registration(on_port_registration)
-	with LiquidSFZ(options.sfz):
+	with LiquidSFZ(options.sfz) as liq:
+		print(liq.stderr())
 		ports_ready.wait()
 		for src_port, dest_port in zip(src_ports, dest_ports):
 			conn_man.connect(src_port, dest_port)
