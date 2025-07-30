@@ -6,7 +6,7 @@ You must install liquidsfz first for this package to work. To install:
 
 	$ git clone https://github.com/swesterfeld/liquidsfz.git
 
-Follow the instructions found in the liquidsfz README.
+Follow the instructions found in the liquidsfz README to install.
 
 ## QuickStart Example
 
@@ -93,4 +93,15 @@ of the function.
 	 - CC #7 - Volume [ default 100 ]
 	 - CC #10 - Pan [ default 64 ]
 
+## quick-liq
 
+Need to listen to an .sfz file without a lot of hassle? Call "quick-liq
+<path-to-sfz>" from the command line, like so:
+
+	$ quick-liq <path-to-sfz>
+
+The above command loads the given .sfz file in a liquidsfz instance and
+automatically connects the Jack MIDI input and Jack audio outputs to the first
+available (physical) ports. So far, it's the quickest, easiest way I found to
+listen to the sound of an .sfz without hassling with container apps or Jack
+connections.
