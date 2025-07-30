@@ -22,7 +22,7 @@ Does a quick test of the LiquidSFZ class API.
 """
 import sys, logging
 from pprint import pprint
-from good_logging import log_error
+from log_soso import log_error
 from liquiphy import LiquidSFZ, UsageError
 
 if __name__ == "__main__":
