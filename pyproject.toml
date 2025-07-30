@@ -23,7 +23,7 @@ Home = "https://github.com/Zen-Master-SoSo/liquiphy"
 quick-liq = "liquiphy.quick_liq:main"
 
 [bumpver]
-current_version = "1.0.2"
+current_version = "1.0.3"
 version_pattern = "MAJOR.MINOR.PATCH"
 commit_message = "Bump version {old_version} -> {new_version}"
 commit = true
