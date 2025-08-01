@@ -15,7 +15,7 @@ classifiers = [
 	"Topic :: Multimedia :: Sound/Audio :: MIDI"
 ]
 dynamic = ["version", "description"]
-dependencies = ["jack_connection_manager"]
+dependencies = ["conn_jack"]
 
 [project.urls]
 Home = "https://github.com/Zen-Master-SoSo/liquiphy"

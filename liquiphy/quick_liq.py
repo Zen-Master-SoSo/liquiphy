@@ -4,7 +4,7 @@
 #
 import sys, logging, argparse
 from threading import Event
-from jack_connection_manager import JackConnectionManager, JackConnectError
+from conn_jack import JackConnectionManager, JackConnectError
 from liquiphy import LiquidSFZ
 
 liq_name = None
