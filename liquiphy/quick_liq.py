@@ -37,6 +37,7 @@ def on_port_registration(port, action):
 	if len(src_ports) == 3:
 		ports_ready.set()
 
+
 def main():
 	"""
 	Entry point, defined so as to make it easy to reference from bin script.
@@ -61,8 +62,10 @@ def main():
 		return 1
 	conn_man.on_client_registration(on_client_registration)
 	conn_man.on_port_registration(on_port_registration)
+	print(options.sfz)
 	with LiquidSFZ(options.sfz) as liq:
-		print(liq.stderr())
+		if errors := liq.stderr():
+			print(errors)
 		ports_ready.wait()
 		for src_port, dest_port in zip(src_ports, dest_ports):
 			conn_man.connect(src_port, dest_port)
