@@ -50,8 +50,8 @@ class LiquidSFZ:
 	def start(self):
 		self.process = subprocess.Popen(
 			[ "liquidsfz", self.filename ],
-			encoding="ASCII",
-			stdout=subprocess.PIPE, stdin=subprocess.PIPE, stderr=subprocess.PIPE)
+			encoding = "ASCII",
+			stdout = subprocess.PIPE, stdin = subprocess.PIPE, stderr = subprocess.PIPE)
 		self.stderr_queue = Queue()
 		Thread(target = self._read_stderr, daemon = True).start()
 		self.read_response()
