@@ -46,7 +46,7 @@ def main():
 	parser.epilog = """
 	Open an .sfz file with liquidsfz and automatically connect input / outputs.
 	"""
-	parser.add_argument('sfz', type = str, help = 'SFZ file to resample.')
+	parser.add_argument('sfz', type = str, help = 'SFZ file to preview.')
 	parser.add_argument("--verbose", "-v", action = "store_true",
 		help = "Show more detailed debug information.")
 	options = parser.parse_args()
