@@ -1,7 +1,25 @@
-#  liquiphy/quick_liq.py
+#  liquiphy/liquiphy/quick_liq.py
 #
-#  Copyright 2025 Leon Dionne <ldionne@dridesign.sh.cn>
+#  Copyright 2024-2026 Leon Dionne <ldionne@dridesign.sh.cn>
 #
+#  This program is free software; you can redistribute it and/or modify
+#  it under the terms of the GNU General Public License as published by
+#  the Free Software Foundation; either version 2 of the License, or
+#  (at your option) any later version.
+#
+#  This program is distributed in the hope that it will be useful,
+#  but WITHOUT ANY WARRANTY; without even the implied warranty of
+#  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+#  GNU General Public License for more details.
+#
+#  You should have received a copy of the GNU General Public License
+#  along with this program; if not, write to the Free Software
+#  Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston,
+#  MA 02110-1301, USA.
+#
+"""
+Open an .sfz file with liquidsfz and automatically connect input / outputs.
+"""
 import sys, logging, argparse
 from threading import Event
 from conn_jack import JackConnectionManager, JackConnectError
@@ -43,9 +61,7 @@ def main():
 	Entry point, defined so as to make it easy to reference from bin script.
 	"""
 	parser = argparse.ArgumentParser()
-	parser.epilog = """
-	Open an .sfz file with liquidsfz and automatically connect input / outputs.
-	"""
+	parser.epilog = __doc__
 	parser.add_argument('sfz', type = str, help = 'SFZ file to preview.')
 	parser.add_argument("--verbose", "-v", action = "store_true",
 		help = "Show more detailed debug information.")
@@ -81,4 +97,5 @@ def main():
 if __name__ == "__main__":
 	main()
 
-#  end liquiphy/quick_liq.py
+
+#  end liquiphy/liquiphy/quick_liq.py
