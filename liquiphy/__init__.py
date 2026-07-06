@@ -27,7 +27,8 @@ To see available commnds:
 		print(liquid.help())
 
 """
-import subprocess, io, os, re, logging
+import subprocess, io, os, logging
+from re import compile as rcompile
 from functools import partial
 from threading import Thread
 from queue import Queue, Empty
@@ -35,7 +36,7 @@ from queue import Queue, Empty
 __version__ = "1.2.0"
 
 PROMPT		= 'liquidsfz> '
-HELP_REGEX	= '^(\w+)\s([^\-]+)\-\s(.*)'
+HELP_REGEX	= rcompile(r'^(\w+)\s([^\-]+)\-\s(.*)')
 USAGE_ERR	= 'Usage: LiquidSFZ.%s(%s) # %s'
 
 
@@ -57,7 +58,7 @@ class LiquidSFZ:
 		self.read_response()
 		self.write('help')
 		for line in self.read_response().split(os.linesep):
-			m = re.match(HELP_REGEX, line)
+			m = HELP_REGEX.match(line)
 			if m:
 				args = m[2].strip()
 				funcsig = (
