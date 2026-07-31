@@ -121,14 +121,13 @@ class LiquidSFZ:
 
 	def stderr_lines(self):
 		"""
-		Return the (str) content of the liquidsfz instance's stderr as an list of lines.
+		Generator which yields the (str) content of the liquidsfz instance's stderr.
 		"""
-		lines = []
 		while True:
 			try:
-				lines.append(self.stderr_queue.get_nowait())
+				yield self.stderr_queue.get_nowait()
 			except Empty:
-				return lines
+				break
 
 	def __enter__(self):
 		return self
