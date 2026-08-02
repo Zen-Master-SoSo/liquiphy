@@ -45,6 +45,7 @@ class LiquidSFZ:
 	def __init__(self, filename = None, defer_start = False):
 		self.filename = os.path.join(os.path.dirname(__file__), "empty.sfz") \
 			if filename is None else filename
+		self.started = False
 		if not defer_start:
 			self.start()
 
@@ -56,23 +57,160 @@ class LiquidSFZ:
 		self.stderr_queue = Queue()
 		Thread(target = self._read_stderr, daemon = True).start()
 		self.read_response()
-		self.write('help')
-		for line in self.read_response().split(os.linesep):
-			m = HELP_REGEX.match(line)
-			if m:
-				args = m[2].strip()
-				funcsig = (
-					m[1],
-					args.split(' ') if args else [],
-					m[3]
-				)
-				setattr(self, funcsig[0], partial(self._exec, funcsig))
+		self.started = True
 
-	def _exec(self, funcsig, /, *args):
-		if len(funcsig[1]) != len(args):
-			raise UsageError(USAGE_ERR %
-				(funcsig[0], ", ".join(funcsig[1]), funcsig[2]))
-		self.write(funcsig[0] + " " + " ".join(str(arg) for arg in args))
+	def help(self):
+		"""
+		show this help
+		"""
+		self.write(f"help")
+		return self.read_response()
+
+	def quit(self):
+		"""
+		quit liquidsfz
+		"""
+		self.write(f"quit")
+		return self.read_response()
+
+	def load(self, sfz_filename):
+		"""
+		load sfz from filename
+		"""
+		self.write(f"load {sfz_filename}")
+		return self.read_response()
+
+	def allsoundoff(self):
+		"""
+		stop all sounds
+		"""
+		self.write(f"allsoundoff")
+		return self.read_response()
+
+	def reset(self):
+		"""
+		system reset (stop all sounds, reset controllers)
+		"""
+		self.write(f"reset")
+		return self.read_response()
+
+	def noteon(self, chan, key, vel):
+		"""
+		start note
+		"""
+		self.write(f"noteon {chan} {key} {vel}")
+		return self.read_response()
+
+	def noteoff(self, chan, key):
+		"""
+		stop note
+		"""
+		self.write(f"noteoff {chan} {key}")
+		return self.read_response()
+
+	def cc(self, chan, ctrl, value):
+		"""
+		send controller event
+		"""
+		self.write(f"cc {chan} {ctrl} {value}")
+		return self.read_response()
+
+	def pitch_bend(self, chan, val):
+		"""
+		send pitch bend event (0 <= val <= 16383)
+		"""
+		self.write(f"pitch_bend {chan} {val}")
+		return self.read_response()
+
+	def gain(self, value):
+		"""
+		set gain (0 <= value <= 5)
+		"""
+		self.write(f"gain {value}")
+		return self.read_response()
+
+	def max_voices(self, value):
+		"""
+		set maximum number of voices
+		"""
+		self.write(f"max_voices {value}")
+		return self.read_response()
+
+	def max_cache_size(self, size):
+		"""
+		set maximum cache size in MB
+		"""
+		self.write(f"max_cache_size {size}")
+		return self.read_response()
+
+	def preload_time(self, time):
+		"""
+		set preload time in ms
+		"""
+		self.write(f"preload_time {time}")
+		return self.read_response()
+
+	def keys(self):
+		"""
+		show keys supported by the sfz
+		"""
+		self.write(f"keys")
+		return self.read_response()
+
+	def switches(self):
+		"""
+		show switches supported by the sfz
+		"""
+		self.write(f"switches")
+		return self.read_response()
+
+	def ccs(self):
+		"""
+		show ccs supported by the sfz
+		"""
+		self.write(f"ccs")
+		return self.read_response()
+
+	def stats(self):
+		"""
+		show voices/cache/cpu usage
+		"""
+		self.write(f"stats")
+		return self.read_response()
+
+	def info(self):
+		"""
+		show information
+		"""
+		self.write(f"info")
+		return self.read_response()
+
+	def voice_count(self):
+		"""
+		print number of active synthesis voices
+		"""
+		self.write(f"voice_count")
+		return self.read_response()
+
+	def sleep(self, time_ms):
+		"""
+		sleep for some milliseconds
+		"""
+		self.write(f"sleep {time_ms}")
+		return self.read_response()
+
+	def source(self, filename):
+		"""
+		load a file and execute each line as command
+		"""
+		self.write(f"source {filename}")
+		return self.read_response()
+
+	def echo(self, text):
+		"""
+		print text
+		"""
+		self.write(f"echo {text}")
 		return self.read_response()
 
 	def write(self, command):
@@ -80,8 +218,9 @@ class LiquidSFZ:
 		Send a command to the liquidsfz instance running in a subprocess.
 		This function is normally used internally and not called from outside.
 		"""
-		self.process.stdin.write(command + os.linesep)
-		self.process.stdin.flush()
+		if self.started:
+			self.process.stdin.write(command + os.linesep)
+			self.process.stdin.flush()
 
 	def read_response(self):
 		"""
@@ -90,7 +229,7 @@ class LiquidSFZ:
 		"""
 		buf = io.StringIO()
 		line = str()
-		while True:
+		while self.started:
 			if self.process.poll() is not None:
 				if self.process.returncode:
 					logging.warning('liquidsfz terminated with exit code %d',
@@ -134,10 +273,6 @@ class LiquidSFZ:
 
 	def __exit__(self, *_):
 		self.quit()
-
-
-class UsageError(Exception):
-	pass
 
 
 #  end liquiphy/__init__.py

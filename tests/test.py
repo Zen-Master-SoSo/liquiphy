@@ -21,9 +21,8 @@
 Does a quick test of the LiquidSFZ class API.
 """
 import sys, logging
-from pprint import pprint
-from log_soso import log_error
-from liquiphy import LiquidSFZ, UsageError
+from column_soso import StringColumns
+from liquiphy import LiquidSFZ
 
 if __name__ == "__main__":
 	log_format = "[%(filename)24s:%(lineno)4d] %(levelname)-8s %(message)s"
@@ -31,9 +30,16 @@ if __name__ == "__main__":
 
 	with LiquidSFZ() as liquid:
 		print('******** Attributes:')
-		pprint([ att for att in dir(liquid) if att[0] != '_' ])
+		StringColumns([ att for att in dir(liquid) if att[0] != '_' ]).print()
+		print()
 		print('******** Info:')
 		print(liquid.info())
+		print('******** CCs:')
+		print(liquid.ccs())
+		print('******** Keys:')
+		print(liquid.keys())
+		print('******** Switches:')
+		print(liquid.switches())
 		print('******** Set max_voices to 8 ...')
 		print(liquid.max_voices(8))
 		print('******** Info:')
@@ -43,18 +49,27 @@ if __name__ == "__main__":
 			print('******** Send bad command ...')
 			liquid.bad_command()
 		except AttributeError as e:
-			log_error(e)
+			logging.error(e)
 
 		try:
 			print('******** Send bad argument ...')
 			liquid.help('bad argument')
-		except UsageError as e:
-			log_error(e)
+		except TypeError as e:
+			logging.error(e)
 
 		try:
 			print('******** Send incomplete arguments ...')
 			liquid.gain()
-		except UsageError as e:
-			log_error(e)
+		except TypeError as e:
+			logging.error(e)
+
+		liquid.noteon(0, 48, 80)
+		liquid.sleep(100)
+		liquid.noteoff(0, 48)
+		liquid.sleep(100)
+		liquid.noteon(0, 48, 80)
+		liquid.sleep(100)
+		liquid.allsoundoff()
+		liquid.reset()
 
 #  end liquiphy/test.py
