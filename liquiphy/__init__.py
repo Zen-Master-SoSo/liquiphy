@@ -244,8 +244,7 @@ class LiquidSFZ:
 				line += char
 			if line == PROMPT:
 				break
-		buf.seek(0)
-		return buf.read()
+		return buf.getvalue()
 
 	def _read_stderr(self):
 		for line in iter(self.process.stderr.readline, b''):

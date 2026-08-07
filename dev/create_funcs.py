@@ -91,8 +91,7 @@ class FuncMaker:
 				line += char
 			if line == PROMPT:
 				break
-		buf.seek(0)
-		return buf.read()
+		return buf.getvalue()
 
 	def read_stderr(self):
 		for line in iter(self.process.stderr.readline, b''):
