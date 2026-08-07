@@ -33,7 +33,7 @@ from functools import partial
 from threading import Thread
 from queue import Queue, Empty
 
-__version__ = "1.3.1"
+__version__ = "1.3.2"
 
 PROMPT		= 'liquidsfz> '
 HELP_REGEX	= rcompile(r'^(\w+)\s([^\-]+)\-\s(.*)')
